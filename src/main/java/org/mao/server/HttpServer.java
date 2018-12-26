@@ -1,16 +1,27 @@
 package org.mao.server;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
+import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpServer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServer.class);
+
+    static {
+        PropertyConfigurator.configure("CarryBrickCloud/src/main/resources/conf/log4j.properties");
+    }
 
     private final int port;
 
@@ -19,8 +30,8 @@ public class HttpServer {
     }
 
     public static void main(String[] args) throws Exception {
+        LOGGER.info("Usage: {}, port: {}", HttpServer.class.getSimpleName(), args);
         if (args.length != 1) {
-            System.err.println("Usage: " + HttpServer.class.getSimpleName() + " <port>");
             return;
         }
         int port = Integer.parseInt(args[0]);
@@ -29,24 +40,22 @@ public class HttpServer {
 
     public void start() throws Exception {
         ServerBootstrap b = new ServerBootstrap();
-        NioEventLoopGroup group = new NioEventLoopGroup();
-        b.group(group)
+        EventLoopGroup bossGroup = new NioEventLoopGroup();        // 用来接收进来的连接
+        EventLoopGroup workerGroup = new NioEventLoopGroup();    // 用来处理已经被接收的连接
+        b.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    public void initChannel(SocketChannel ch)
-                            throws Exception {
-                        System.out.println("initChannel ch:" + ch);
-                        ch.pipeline()
-                                .addLast("decoder", new HttpRequestDecoder())   // 1you
-                                .addLast("encoder", new HttpResponseEncoder())  // 2
-                                .addLast("aggregator", new HttpObjectAggregator(512 * 1024))    // 3
-                                .addLast("handler", new HttpHandler());        // 4
+                    public void initChannel(SocketChannel ch) throws Exception {
+                        LOGGER.info("initChannel ch: {}", ch);
+                        ch.pipeline().addLast("handler", new HttpServerHandler());
                     }
                 })
-                .option(ChannelOption.SO_BACKLOG, 128) // determining the number of connections queued
+                .option(ChannelOption.SO_BACKLOG, 1024) // determining the number of connections queued
                 .childOption(ChannelOption.SO_KEEPALIVE, Boolean.TRUE);
 
-        b.bind(port).sync();
+        ChannelFuture cf = b.bind(port).sync();
+        //获取ChannelFuture，并且阻塞当前线程直到它完成。
+        cf.channel().closeFuture().sync();
     }
 }

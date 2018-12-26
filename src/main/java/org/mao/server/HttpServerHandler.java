@@ -1,7 +1,9 @@
 package org.mao.server;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -11,36 +13,38 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.AsciiString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> { // 1
+public class HttpServerHandler extends ChannelInboundHandlerAdapter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerHandler.class);
 
     private AsciiString contentType = HttpHeaderValues.TEXT_PLAIN;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
-        System.out.println("class:" + msg.getClass().getName());
-        DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
-                HttpResponseStatus.OK,
-                Unpooled.wrappedBuffer("test".getBytes())); // 2
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        ByteBuf buf = (ByteBuf)msg;
+        byte[] req = new byte[buf.readableBytes()];
+        buf.readBytes(req);
+        String reqStr = new String(req, "UTF-8");
+        LOGGER.info("msg:{}", reqStr);
 
-        HttpHeaders heads = response.headers();
-        heads.add(HttpHeaderNames.CONTENT_TYPE, contentType + "; charset=UTF-8");
-        heads.add(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes()); // 3
-        heads.add(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-
-        ctx.write(response);
+        byte[] rep = "go away".getBytes();
+        ByteBuf responseMsg = Unpooled.buffer(rep.length);
+        responseMsg.writeBytes(rep);
+        ctx.write(responseMsg);
     }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("channelReadComplete");
-        super.channelReadComplete(ctx);
-        ctx.flush(); // 4
+        LOGGER.info("ServerChannelReadComplete");
+        ctx.flush();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        System.out.println("exceptionCaught");
+        LOGGER.info("exceptionCaught");
         if (null != cause) {
             cause.printStackTrace();
         }
