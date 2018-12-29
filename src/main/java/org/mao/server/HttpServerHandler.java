@@ -2,17 +2,11 @@ package org.mao.server;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.util.AsciiString;
+import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,26 +14,41 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerHandler.class);
 
-    private AsciiString contentType = HttpHeaderValues.TEXT_PLAIN;
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        LOGGER.info("channelActive");
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        LOGGER.info("channelInactive");
+    }
+
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        LOGGER.info("handlerAdded");
+    }
+
+    @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+        LOGGER.info("handlerRemoved");
+    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf buf = (ByteBuf)msg;
-        byte[] req = new byte[buf.readableBytes()];
-        buf.readBytes(req);
-        String reqStr = new String(req, "UTF-8");
-        LOGGER.info("msg:{}", reqStr);
+        LOGGER.info("recevie msg from client: {}", msg);
 
-        byte[] rep = "go away".getBytes();
-        ByteBuf responseMsg = Unpooled.buffer(rep.length);
-        responseMsg.writeBytes(rep);
-        ctx.write(responseMsg);
+        MessageDTO responseDTO = new MessageDTO();
+        responseDTO.setMsg("over");
+        responseDTO.setCode("10000");
+
+        Channel channel = ctx.channel();
+        channel.writeAndFlush(responseDTO);
     }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         LOGGER.info("ServerChannelReadComplete");
-        ctx.flush();
     }
 
     @Override
