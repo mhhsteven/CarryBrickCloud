@@ -16,11 +16,9 @@ public class MessageDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     public MessageDecoder() {
         this(Charset.defaultCharset());
-        System.out.println(1);
     }
 
     public MessageDecoder(Charset charset) {
-        System.out.println(1);
         if (charset == null) {
             throw new NullPointerException("charset");
         } else {
@@ -30,7 +28,6 @@ public class MessageDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        System.out.println("decoder: " + msg);
         String json = msg.toString(this.charset);
         MessageDTO messageDTO = JSON.parseObject(json, MessageDTO.class);
         out.add(messageDTO);

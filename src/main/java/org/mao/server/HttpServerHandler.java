@@ -1,16 +1,12 @@
 package org.mao.server;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpServerHandler extends ChannelInboundHandlerAdapter {
+public class HttpServerHandler extends SimpleChannelInboundHandler<MessageDTO> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerHandler.class);
 
@@ -35,7 +31,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead0(ChannelHandlerContext ctx, MessageDTO msg) throws Exception {
         LOGGER.info("recevie msg from client: {}", msg);
 
         MessageDTO responseDTO = new MessageDTO();

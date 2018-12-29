@@ -1,8 +1,6 @@
 package org.mao.server;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
@@ -28,13 +26,8 @@ public class MessageEncoder extends MessageToMessageEncoder<MessageDTO> {
     }
 
     protected void encode(ChannelHandlerContext ctx, MessageDTO msg, List<Object> out) throws Exception {
-        System.out.println("encoder: " + msg);
         if (msg != null) {
-            byte[] b = msg.toString().getBytes(this.charset);
-            ByteBuf responseMsg = Unpooled.buffer(b.length);
-            responseMsg.writeBytes(b);
-            //out.add(ByteBufUtil.encodeString(ctx.alloc(), CharBuffer.wrap(msg.toString()), this.charset));
-            out.add(responseMsg);
+            out.add(ByteBufUtil.encodeString(ctx.alloc(), CharBuffer.wrap(msg.toString()), this.charset));
         }
     }
 }
