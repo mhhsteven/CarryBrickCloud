@@ -1,5 +1,7 @@
 package org.mao.server;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -9,6 +11,8 @@ import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+import java.util.Map;
 import java.util.Random;
 
 public class HttpClient {
@@ -45,11 +49,22 @@ public class HttpClient {
                 public void run() {
                     try {
                         Thread.sleep(1000L);
-                        for (int i = 0; i < 100; i++) {
+                        for (int i = 0; i < 10; i++) {
                             MessageDTO messageDTO = new MessageDTO();
-                            messageDTO.setMsg((new Random()).nextInt(1000000) + "");
+                            messageDTO.setMsg("侬一扎");
+                            messageDTO.setCode((new Random()).nextInt(1000000));
+                            messageDTO.setTime(new Date());
+
+                            MessageSubDTO subMsg = new MessageSubDTO();
+                            subMsg.setNameList(Lists.newArrayList("张三", "李四"));
+                            Map<Integer, String> keyMap = Maps.newHashMap();
+                            keyMap.put(1, "a");
+                            keyMap.put(2, "b");
+                            subMsg.setKeyMap(keyMap);
+                            messageDTO.setSubMsg(subMsg);
+
                             channel.writeAndFlush(messageDTO);
-                            Thread.sleep((new Random()).nextInt(300));
+                            Thread.sleep((new Random()).nextInt(100));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

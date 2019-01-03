@@ -6,8 +6,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
-
 public class HttpServerHandler extends SimpleChannelInboundHandler<MessageDTO> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerHandler.class);
@@ -36,12 +34,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<MessageDTO> {
     public void channelRead0(ChannelHandlerContext ctx, MessageDTO msg) throws Exception {
         LOGGER.info("recevie msg from client: {}", msg);
 
-        MessageDTO responseDTO = new MessageDTO();
-        responseDTO.setMsg("over");
-        responseDTO.setCode((new Random()).nextInt(1000000) + "");
+        msg.setMsg(msg.getMsg() + " over");
 
         Channel channel = ctx.channel();
-        channel.writeAndFlush(responseDTO);
+        channel.writeAndFlush(msg);
     }
 
     @Override

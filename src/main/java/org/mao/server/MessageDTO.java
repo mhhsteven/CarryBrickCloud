@@ -4,12 +4,17 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class MessageDTO implements Serializable {
 
     private String msg;
 
-    private String code;
+    private Integer code;
+
+    private Date time;
+
+    private MessageSubDTO subMsg;
 
     public String getMsg() {
         return msg;
@@ -19,12 +24,28 @@ public class MessageDTO implements Serializable {
         this.msg = msg;
     }
 
-    public String getCode() {
+    public Integer getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(Integer code) {
         this.code = code;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public MessageSubDTO getSubMsg() {
+        return subMsg;
+    }
+
+    public void setSubMsg(MessageSubDTO subMsg) {
+        this.subMsg = subMsg;
     }
 
     @Override
