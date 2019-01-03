@@ -6,6 +6,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Random;
+
 public class HttpServerHandler extends SimpleChannelInboundHandler<MessageDTO> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerHandler.class);
@@ -36,7 +38,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<MessageDTO> {
 
         MessageDTO responseDTO = new MessageDTO();
         responseDTO.setMsg("over");
-        responseDTO.setCode("10000");
+        responseDTO.setCode((new Random()).nextInt(1000000) + "");
 
         Channel channel = ctx.channel();
         channel.writeAndFlush(responseDTO);
@@ -45,6 +47,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<MessageDTO> {
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         LOGGER.info("ServerChannelReadComplete");
+        ctx.flush();
     }
 
     @Override

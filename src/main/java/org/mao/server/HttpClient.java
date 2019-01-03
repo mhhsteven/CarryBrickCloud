@@ -9,6 +9,8 @@ import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Random;
+
 public class HttpClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClient.class);
@@ -38,9 +40,24 @@ public class HttpClient {
                     .handler(new HttpClientInitializer());
             Channel channel = boot.connect(host, port).sync().channel();
 
-            MessageDTO messageDTO = new MessageDTO();
-            messageDTO.setMsg("request");
-            channel.writeAndFlush(messageDTO);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(1000L);
+                        for (int i = 0; i < 100; i++) {
+                            MessageDTO messageDTO = new MessageDTO();
+                            messageDTO.setMsg((new Random()).nextInt(1000000) + "");
+                            channel.writeAndFlush(messageDTO);
+                            Thread.sleep((new Random()).nextInt(300));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }).start();
+
             channel.closeFuture().sync();
         } finally {
             group.shutdownGracefully();

@@ -2,15 +2,13 @@ package org.mao.server;
 
 import com.alibaba.fastjson.JSON;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.nio.charset.Charset;
 import java.util.List;
 
-@Sharable
-public class MessageDecoder extends MessageToMessageDecoder<ByteBuf> {
+public class MessageDecoder extends ByteToMessageDecoder {
 
     private final Charset charset;
 
@@ -27,8 +25,11 @@ public class MessageDecoder extends MessageToMessageDecoder<ByteBuf> {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        String json = msg.toString(this.charset);
+    protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws Exception {
+        int dataLength = buf.readInt();
+        byte[] b = new byte[dataLength];
+        buf.readBytes(b);
+        String json = new String(b, this.charset);
         MessageDTO messageDTO = JSON.parseObject(json, MessageDTO.class);
         out.add(messageDTO);
     }

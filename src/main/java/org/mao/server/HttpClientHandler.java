@@ -27,7 +27,7 @@ public class HttpClientHandler extends SimpleChannelInboundHandler<MessageDTO> {
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         LOGGER.info("ClientChannelReadComplete");
-        ctx.close();
+        ctx.flush();
     }
 
     //处理过程中出现的异常
