@@ -117,8 +117,6 @@ hs_err_pid*
 node_modules/
 node_modules/*
 
-#projects/landlord/mogoroom-partner/src/main/webapp/node_modules
-
 # Code Recommenders
 .recommenders/
 .idea/
