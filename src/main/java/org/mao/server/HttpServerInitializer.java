@@ -6,6 +6,8 @@ import io.netty.channel.socket.SocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
+
 public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerInitializer.class);
@@ -20,6 +22,7 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast("encoder", new MessageEncoder());
         pipeline.addLast("handler", new HttpServerHandler());
 
-        LOGGER.info("connect from {}", ch.remoteAddress());
+        InetSocketAddress address = ch.remoteAddress();
+        LOGGER.info("connect from {}:{}:{}:{}", address.getHostString(), address.getAddress().getHostAddress(), address.getHostName(), address.getPort());
     }
 }
