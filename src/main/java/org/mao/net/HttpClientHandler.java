@@ -1,11 +1,12 @@
-package org.mao.server;
+package org.mao.net;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.mao.job.bean.BaseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpClientHandler extends SimpleChannelInboundHandler<MessageDTO> {
+public class HttpClientHandler extends SimpleChannelInboundHandler<BaseDTO> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientHandler.class);
 
@@ -20,7 +21,7 @@ public class HttpClientHandler extends SimpleChannelInboundHandler<MessageDTO> {
 
     //当从服务器接受到一条消息时被调用
     @Override
-    public void channelRead0(ChannelHandlerContext ctx, MessageDTO msg) throws Exception {
+    public void channelRead0(ChannelHandlerContext ctx, BaseDTO msg) throws Exception {
         LOGGER.info("receive msg from server: {}", msg);
     }
 

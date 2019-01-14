@@ -1,4 +1,4 @@
-package org.mao.server;
+package org.mao.net;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -10,9 +10,9 @@ import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpServer {
+public class HttpServerTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerTest.class);
 
     static {
         PropertyConfigurator.configure("CarryBrickCloud/src/main/resources/conf/log4j.properties");
@@ -20,17 +20,17 @@ public class HttpServer {
 
     private final int port;
 
-    public HttpServer(int port) {
+    public HttpServerTest(int port) {
         this.port = port;
     }
 
     public static void main(String[] args) throws Exception {
-        LOGGER.info("Usage: {}, port: {}", HttpServer.class.getSimpleName(), args);
+        LOGGER.info("Usage: {}, port: {}", HttpServerTest.class.getSimpleName(), args);
         if (args.length != 1) {
             return;
         }
         int port = Integer.parseInt(args[0]);
-        new HttpServer(port).start();
+        new HttpServerTest(port).start();
     }
 
     public void start() throws Exception {

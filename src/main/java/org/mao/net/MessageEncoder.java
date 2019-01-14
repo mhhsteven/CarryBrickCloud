@@ -1,12 +1,13 @@
-package org.mao.server;
+package org.mao.net;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.mao.job.bean.BaseDTO;
 
 import java.nio.charset.Charset;
 
-public class MessageEncoder extends MessageToByteEncoder<MessageDTO> {
+public class MessageEncoder<T extends BaseDTO> extends MessageToByteEncoder<BaseDTO> {
     private final Charset charset;
 
     public MessageEncoder() {
@@ -21,7 +22,7 @@ public class MessageEncoder extends MessageToByteEncoder<MessageDTO> {
         }
     }
 
-    protected void encode(ChannelHandlerContext ctx, MessageDTO msg, ByteBuf buf) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, BaseDTO msg, ByteBuf buf) throws Exception {
         if (msg != null) {
             byte[] b = msg.toString().getBytes(this.charset);
             buf.writeInt(b.length);

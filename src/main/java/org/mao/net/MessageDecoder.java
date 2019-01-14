@@ -1,9 +1,10 @@
-package org.mao.server;
+package org.mao.net;
 
 import com.alibaba.fastjson.JSON;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.mao.job.bean.BaseDTO;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -50,7 +51,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
         byte[] b = new byte[dataLength];
         buf.readBytes(b);
         String json = new String(b, this.charset);
-        MessageDTO messageDTO = JSON.parseObject(json, MessageDTO.class);
+        BaseDTO messageDTO = JSON.parseObject(json, BaseDTO.class);
         out.add(messageDTO);
     }
 }

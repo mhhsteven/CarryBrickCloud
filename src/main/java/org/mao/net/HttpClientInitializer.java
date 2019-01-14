@@ -1,4 +1,4 @@
-package org.mao.server;
+package org.mao.net;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;

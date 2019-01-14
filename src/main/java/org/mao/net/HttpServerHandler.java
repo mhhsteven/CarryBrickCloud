@@ -1,12 +1,13 @@
-package org.mao.server;
+package org.mao.net;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.mao.job.bean.BaseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpServerHandler extends SimpleChannelInboundHandler<MessageDTO> {
+public class HttpServerHandler<T extends BaseDTO> extends SimpleChannelInboundHandler<BaseDTO> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerHandler.class);
 
@@ -31,7 +32,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<MessageDTO> {
     }
 
     @Override
-    public void channelRead0(ChannelHandlerContext ctx, MessageDTO msg) throws Exception {
+    public void channelRead0(ChannelHandlerContext ctx, BaseDTO msg) throws Exception {
         LOGGER.info("recevie msg from client: {}", msg);
 
         msg.setMsg(msg.getMsg() + " over");
