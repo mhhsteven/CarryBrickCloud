@@ -5,11 +5,15 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.mao.job.bean.BaseDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.util.List;
 
 public class MessageDecoder extends ByteToMessageDecoder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageDecoder.class);
 
     private static final Integer HEAD_LENGTH = 4;
 
@@ -51,6 +55,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
         byte[] b = new byte[dataLength];
         buf.readBytes(b);
         String json = new String(b, this.charset);
+        LOGGER.info("decoder: {}", json);
         BaseDTO messageDTO = JSON.parseObject(json, BaseDTO.class);
         out.add(messageDTO);
     }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
 
@@ -15,7 +16,7 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
 
     private boolean flag = true;
 
-    private String[] nameArray = new String[]{"小A", "按时发货", "idsg", "浪费", "丢法国", "忙啥呢个", "却无法", "能否", "欧冠", "经恢复"};
+    private String[] nameArray = new String[]{"任务1", "任务2", "任务3", "任务4", "任务5", "任务6", "任务7", "任务8", "任务9", "任务10"};
 
     private int age = 0;
 
@@ -34,8 +35,14 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
 
     @Override
     public void process(MessageDTO messageDTO) {
-        LOGGER.info("开始处理");
-        LOGGER.info("{}", messageDTO);
+        LOGGER.info("开始处理: {}", messageDTO);
+        Random random = new Random();
+        int delay = random.nextInt(5) + 5;
+        try {
+            Thread.sleep(delay * 1000);
+        } catch (Exception e) {
+
+        }
         LOGGER.info("结束处理");
     }
 }

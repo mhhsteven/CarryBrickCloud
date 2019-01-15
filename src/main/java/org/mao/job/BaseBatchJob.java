@@ -6,6 +6,7 @@ import org.mao.net.HttpServer;
 import org.mao.task.BrickDispatcher;
 import org.mao.task.TaskRoleEnum;
 import org.mao.task.TaskStatusEnum;
+import org.mao.utils.AsyncExecuteUtils;
 import org.mao.utils.IpAddressUtils;
 import org.mao.utils.JobConfig;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public class BaseBatchJob<T> implements IBatchJob<T> {
 
     private HttpServer httpServer;
 
-    private String host;
+    private String host = "127.0.0.1";
     private Integer port = 60000;
 
     @PostConstruct
@@ -48,9 +49,13 @@ public class BaseBatchJob<T> implements IBatchJob<T> {
     }
 
     public boolean dispose(T t) {
+        LOGGER.info("dispose1: {}", t);
         this.statusEnum = TaskStatusEnum.RUNNING;
+        LOGGER.info("dispose2: {}", t);
         this.process(t);
+        LOGGER.info("dispose3: {}", t);
         this.statusEnum = TaskStatusEnum.WAIT;
+        LOGGER.info("dispose4: {}", t);
         return true;
     }
 
@@ -61,44 +66,49 @@ public class BaseBatchJob<T> implements IBatchJob<T> {
     }
 
     private void run() {
+        BrickDispatcher brickDispatcher = new BrickDispatcher(this);
         if (this.isMaster()) {
-            this.startServer();
+            this.startServer(brickDispatcher);
             this.statusEnum = TaskStatusEnum.WAIT;
-            BrickDispatcher brickDispatcher = new BrickDispatcher(this);
-            brickDispatcher.dispatcher();
+            AsyncExecuteUtils.execute("调度器任务", new Runnable() {
+                @Override
+                public void run() {
+                    brickDispatcher.dispatcher();
+                }
+            });
         } else {
-            this.startClient();
+            this.startClient(brickDispatcher);
         }
     }
 
-    private void startServer() {
-        new Thread(new Runnable() {
+    private void startServer(final BrickDispatcher brickDispatcher) {
+        AsyncExecuteUtils.execute("服务端", new Runnable() {
             @Override
             public void run() {
                 try {
                     LOGGER.info("以master方式启动，监听端口:{}", port);
                     httpServer = new HttpServer();
-                    httpServer.start(port);
+                    httpServer.start(port, brickDispatcher);
                 } catch (Exception e) {
                     LOGGER.error("以master方式启动失败", e);
                 }
             }
-        }).start();
+        });
     }
 
-    private void startClient() {
-        new Thread(new Runnable() {
+    private void startClient(final BrickDispatcher brickDispatcher) {
+        AsyncExecuteUtils.execute("客户端", new Runnable() {
             @Override
             public void run() {
                 try {
                     LOGGER.info("以slave方式启动，连接ip:{},端口:{}", host, port);
                     HttpClient client = new HttpClient();
-                    client.connect(host, port);
+                    client.connect(host, port, brickDispatcher);
                 } catch (Exception e) {
                     LOGGER.error("以slave方式启动失败", e);
                 }
             }
-        }).start();
+        });
     }
 
     private boolean isMaster() {

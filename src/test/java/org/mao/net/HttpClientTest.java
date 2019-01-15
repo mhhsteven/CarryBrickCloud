@@ -38,7 +38,7 @@ public class HttpClientTest {
             Bootstrap boot = new Bootstrap();
             boot.group(group)
                     .channel(NioSocketChannel.class)
-                    .handler(new HttpClientInitializer());
+                    .handler(new HttpClientInitializer(null));
             Channel channel = boot.connect(host, port).sync().channel();
 
             new Thread(new Runnable() {

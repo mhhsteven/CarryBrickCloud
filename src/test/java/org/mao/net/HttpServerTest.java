@@ -41,7 +41,7 @@ public class HttpServerTest {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
-                .childHandler(new HttpServerInitializer())
+                .childHandler(new HttpServerInitializer(null))
                 .option(ChannelOption.SO_BACKLOG, 128) // determining the number of connections queued
                 .childOption(ChannelOption.SO_KEEPALIVE, Boolean.TRUE);
 

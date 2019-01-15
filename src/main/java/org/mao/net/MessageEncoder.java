@@ -4,10 +4,15 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.mao.job.bean.BaseDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 
-public class MessageEncoder<T extends BaseDTO> extends MessageToByteEncoder<BaseDTO> {
+public class MessageEncoder extends MessageToByteEncoder<BaseDTO> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageEncoder.class);
+
     private final Charset charset;
 
     public MessageEncoder() {
@@ -24,6 +29,7 @@ public class MessageEncoder<T extends BaseDTO> extends MessageToByteEncoder<Base
 
     protected void encode(ChannelHandlerContext ctx, BaseDTO msg, ByteBuf buf) throws Exception {
         if (msg != null) {
+            LOGGER.info("encoder: {}", msg);
             byte[] b = msg.toString().getBytes(this.charset);
             buf.writeInt(b.length);
             buf.writeBytes(b);
