@@ -73,7 +73,7 @@ public class BrickDispatcher<T extends Serializable> {
         }
     }
 
-    public void dispatcher() {
+    private void dispatcher() {
         if (CollectionUtils.isEmpty(dataList)) {
             dataList = batchJob.bunch();
             //没有数据，并且任务都处理完了
@@ -136,7 +136,7 @@ public class BrickDispatcher<T extends Serializable> {
         taskQueue.remove(channel);
     }
 
-    public boolean isMaster() {
+    private boolean isMaster() {
         boolean isLocal = IpAddressUtils.isLocal(host);
         if (isLocal && TaskRoleEnum.MASTER.getRole().equals(JobConfig.getInstance().getNetRole())) {
             return true;
@@ -144,7 +144,7 @@ public class BrickDispatcher<T extends Serializable> {
         return false;
     }
 
-    public void startServer(final BrickDispatcher brickDispatcher) {
+    private void startServer(final BrickDispatcher brickDispatcher) {
         AsyncExecuteUtils.execute("服务端", new Runnable() {
             @Override
             public void run() {
@@ -159,12 +159,12 @@ public class BrickDispatcher<T extends Serializable> {
         });
     }
 
-    public void startClient(final BrickDispatcher brickDispatcher) {
+    private void startClient(final BrickDispatcher brickDispatcher) {
         AsyncExecuteUtils.execute("客户端", new Runnable() {
             @Override
             public void run() {
                 try {
-                    LOGGER.info("以slave方式启动，连接ip:{},端口:{}", host, port);
+                    LOGGER.info("以slave方式启动，连接ip:{}，端口:{}", host, port);
                     HttpClient client = new HttpClient<T>();
                     client.connect(host, port, brickDispatcher, clazz);
                 } catch (Exception e) {

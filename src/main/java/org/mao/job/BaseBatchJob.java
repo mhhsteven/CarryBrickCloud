@@ -39,7 +39,7 @@ public abstract class BaseBatchJob<T extends Serializable> implements IBatchJob<
     }
 
     public static void main(String[] args) {
-        BrickDispatcher<MessageDTO> brickDispatcher = new BrickDispatcher<MessageDTO>();
+        BrickDispatcher brickDispatcher = new BrickDispatcher();
         brickDispatcher.run();
     }
 

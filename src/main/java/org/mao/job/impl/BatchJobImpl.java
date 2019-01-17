@@ -40,7 +40,7 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
             Map<String, Date> dateMap = Maps.newHashMap();
             dateMap.put(name, new Date());
             subMsg.setDateMap(dateMap);
-            messageDTO.setSubMsg(subMsg);
+            //messageDTO.setSubMsg(subMsg);
 
             messageDTOList.add(messageDTO);
         }
