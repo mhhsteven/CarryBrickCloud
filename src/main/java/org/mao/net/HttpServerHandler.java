@@ -50,7 +50,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<BaseDTO> {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        LOGGER.info("ServerChannelReadComplete");
+//        LOGGER.info("ServerChannelReadComplete");
         ctx.flush();
     }
 

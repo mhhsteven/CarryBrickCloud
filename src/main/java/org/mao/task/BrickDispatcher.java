@@ -124,8 +124,8 @@ public class BrickDispatcher<T extends Serializable> {
                 batchJob.dispose(t);
                 if (channel != null) {
                     BaseDTO<T> baseDTO = new BaseDTO<>();
-                    baseDTO.setCode("10000");
-                    baseDTO.setMsg("from client");
+                    baseDTO.setCode("20000");
+                    baseDTO.setMsg("complete by client");
                     channel.writeAndFlush(baseDTO);
                 }
             }

@@ -29,7 +29,6 @@ public class MessageEncoder extends MessageToByteEncoder<BaseDTO> {
 
     protected void encode(ChannelHandlerContext ctx, BaseDTO msg, ByteBuf buf) throws Exception {
         if (msg != null) {
-            LOGGER.info("encoder: {}", msg);
             byte[] b = msg.toString().getBytes(this.charset);
             buf.writeInt(b.length);
             buf.writeBytes(b);
