@@ -10,11 +10,13 @@ import java.io.Serializable;
  *
  * @author mhh
  */
-public class BaseDTO<T> implements Serializable {
+public class BaseDTO<T extends Serializable> implements Serializable {
 
     private String code;
 
     private String msg;
+
+    private Integer type;
 
     private T content;
 
@@ -32,6 +34,14 @@ public class BaseDTO<T> implements Serializable {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     public T getContent() {

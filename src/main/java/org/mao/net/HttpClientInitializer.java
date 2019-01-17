@@ -7,14 +7,19 @@ import org.mao.task.BrickDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
+import java.io.Serializable;
+
+public class HttpClientInitializer<T extends Serializable> extends ChannelInitializer<SocketChannel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientInitializer.class);
 
-    private BrickDispatcher brickDispatcher;
+    private BrickDispatcher<T> brickDispatcher;
 
-    public HttpClientInitializer(BrickDispatcher brickDispatcher) {
+    private Class clazz;
+
+    public HttpClientInitializer(BrickDispatcher<T> brickDispatcher, Class clazz) {
         this.brickDispatcher = brickDispatcher;
+        this.clazz = clazz;
     }
 
     @Override
@@ -22,7 +27,7 @@ public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
         ChannelPipeline pipeline = ch.pipeline();
 
         //pipeline.addLast("framer", new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
-        pipeline.addLast("decoder", new MessageDecoder());
+        pipeline.addLast("decoder", new MessageDecoder<T>(clazz));
         pipeline.addLast("encoder", new MessageEncoder());
         pipeline.addLast("handler", new HttpClientHandler(brickDispatcher));
     }

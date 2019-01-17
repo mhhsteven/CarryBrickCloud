@@ -15,17 +15,7 @@ public enum TaskStatusEnum {
     /**
      * 正在运行
      */
-    RUNNING(1),
-
-    /**
-     * 运行成功
-     */
-    SUCCESS(2),
-
-    /**
-     * 运行失败
-     */
-    FAIL(3);
+    RUNNING(1);
 
     private Integer status;
 

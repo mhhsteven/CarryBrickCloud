@@ -10,11 +10,13 @@ import org.mao.task.BrickDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpServer {
+import java.io.Serializable;
+
+public class HttpServer<T extends Serializable> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServer.class);
 
-    public void start(Integer port, BrickDispatcher brickDispatcher) throws Exception {
+    public void start(Integer port, BrickDispatcher<T> brickDispatcher, Class clazz) throws Exception {
         ServerBootstrap bootstrap = new ServerBootstrap();
         // 用来接收进来的连接
         EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -22,7 +24,7 @@ public class HttpServer {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
-                .childHandler(new HttpServerInitializer(brickDispatcher))
+                .childHandler(new HttpServerInitializer<T>(brickDispatcher, clazz))
                 .option(ChannelOption.SO_BACKLOG, 128) // determining the number of connections queued
                 .childOption(ChannelOption.SO_KEEPALIVE, Boolean.TRUE);
 

@@ -1,23 +1,18 @@
 package org.mao.job;
 
 import org.apache.log4j.PropertyConfigurator;
-import org.mao.net.HttpClient;
-import org.mao.net.HttpServer;
+import org.mao.job.impl.bean.MessageDTO;
 import org.mao.task.BrickDispatcher;
-import org.mao.task.TaskRoleEnum;
 import org.mao.task.TaskStatusEnum;
-import org.mao.utils.AsyncExecuteUtils;
-import org.mao.utils.IpAddressUtils;
-import org.mao.utils.JobConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.annotation.PostConstruct;
+import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-public class BaseBatchJob<T> implements IBatchJob<T> {
+public abstract class BaseBatchJob<T extends Serializable> implements IBatchJob<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseBatchJob.class);
 
@@ -27,99 +22,36 @@ public class BaseBatchJob<T> implements IBatchJob<T> {
 
     private TaskStatusEnum statusEnum;
 
-    private HttpServer httpServer;
-
-    private String host = "127.0.0.1";
-    private Integer port = 60000;
-
     @PostConstruct
     public void init() {
-        port = port + JobConfig.getInstance().getJobId();
-        host = JobConfig.getInstance().getNetMasterIp();
+        this.statusEnum = TaskStatusEnum.WAIT;
     }
 
-    @Override
-    public List<T> bunch() {
-        return null;
-    }
+    public abstract List<T> bunch();
 
-    @Override
-    public void process(T t) {
-
-    }
+    public abstract void process(T t);
 
     public boolean dispose(T t) {
-        LOGGER.info("dispose1: {}", t);
         this.statusEnum = TaskStatusEnum.RUNNING;
-        LOGGER.info("dispose2: {}", t);
         this.process(t);
-        LOGGER.info("dispose3: {}", t);
         this.statusEnum = TaskStatusEnum.WAIT;
-        LOGGER.info("dispose4: {}", t);
         return true;
     }
 
     public static void main(String[] args) {
-        AbstractApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        BaseBatchJob batchJob = (BaseBatchJob) context.getBean("job");
-        batchJob.run();
-    }
-
-    private void run() {
-        BrickDispatcher brickDispatcher = new BrickDispatcher(this);
-        if (this.isMaster()) {
-            this.startServer(brickDispatcher);
-            this.statusEnum = TaskStatusEnum.WAIT;
-            AsyncExecuteUtils.execute("调度器任务", new Runnable() {
-                @Override
-                public void run() {
-                    brickDispatcher.dispatcher();
-                }
-            });
-        } else {
-            this.startClient(brickDispatcher);
-        }
-    }
-
-    private void startServer(final BrickDispatcher brickDispatcher) {
-        AsyncExecuteUtils.execute("服务端", new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    LOGGER.info("以master方式启动，监听端口:{}", port);
-                    httpServer = new HttpServer();
-                    httpServer.start(port, brickDispatcher);
-                } catch (Exception e) {
-                    LOGGER.error("以master方式启动失败", e);
-                }
-            }
-        });
-    }
-
-    private void startClient(final BrickDispatcher brickDispatcher) {
-        AsyncExecuteUtils.execute("客户端", new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    LOGGER.info("以slave方式启动，连接ip:{},端口:{}", host, port);
-                    HttpClient client = new HttpClient();
-                    client.connect(host, port, brickDispatcher);
-                } catch (Exception e) {
-                    LOGGER.error("以slave方式启动失败", e);
-                }
-            }
-        });
-    }
-
-    private boolean isMaster() {
-        boolean isLocal = IpAddressUtils.isLocal(host);
-        if (isLocal && TaskRoleEnum.MASTER.getRole().equals(JobConfig.getInstance().getNetRole())) {
-            return true;
-        }
-        return false;
+        BrickDispatcher<MessageDTO> brickDispatcher = new BrickDispatcher<MessageDTO>();
+        brickDispatcher.run();
     }
 
     public boolean processOver() {
         return this.statusEnum == TaskStatusEnum.WAIT;
+    }
+
+    public Class getRealType() {
+        // 获取当前new的对象的泛型的父类类型
+        ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
+        // 获取第一个类型参数的真实类型
+        Class clazz = (Class<T>) pt.getActualTypeArguments()[0];
+        return clazz;
     }
 }

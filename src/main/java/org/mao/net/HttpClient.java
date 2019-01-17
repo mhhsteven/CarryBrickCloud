@@ -9,19 +9,20 @@ import org.mao.task.BrickDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpClient {
+import java.io.Serializable;
+
+public class HttpClient<T extends Serializable> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClient.class);
 
-    public void connect(String host, int port, BrickDispatcher brickDispatcher) throws Exception {
+    public void connect(String host, int port, BrickDispatcher brickDispatcher, Class clazz) throws Exception {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap boot = new Bootstrap();
             boot.group(group)
                     .channel(NioSocketChannel.class)
-                    .handler(new HttpClientInitializer(brickDispatcher));
+                    .handler(new HttpClientInitializer<T>(brickDispatcher, clazz));
             Channel channel = boot.connect(host, port).sync().channel();
-            LOGGER.info("client channel: {}", channel);
             channel.closeFuture().sync();
         } finally {
             group.shutdownGracefully();

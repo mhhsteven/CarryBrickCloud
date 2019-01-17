@@ -1,7 +1,5 @@
 package org.mao.job;
 
-import org.mao.job.bean.BaseDTO;
-
 import java.util.List;
 
 public interface IBatchJob<T> {

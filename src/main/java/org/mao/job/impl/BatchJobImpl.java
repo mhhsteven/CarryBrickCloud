@@ -1,13 +1,17 @@
 package org.mao.job.impl;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.mao.job.BaseBatchJob;
 import org.mao.job.impl.bean.MessageDTO;
+import org.mao.job.impl.bean.MessageSubDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
@@ -25,9 +29,19 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
         List<MessageDTO> messageDTOList = Lists.newArrayList();
         if (age < nameArray.length) {
             MessageDTO messageDTO = new MessageDTO();
-            messageDTO.setName(nameArray[age]);
+            String name = nameArray[age];
+            messageDTO.setName(name);
             messageDTO.setAge(++age + 17);
             messageDTO.setBirthday(new Date());
+
+            MessageSubDTO subMsg = new MessageSubDTO();
+            List<BigDecimal> amountList = Lists.newArrayList(BigDecimal.valueOf(1), BigDecimal.valueOf(1.1));
+            subMsg.setAmountList(amountList);
+            Map<String, Date> dateMap = Maps.newHashMap();
+            dateMap.put(name, new Date());
+            subMsg.setDateMap(dateMap);
+            messageDTO.setSubMsg(subMsg);
+
             messageDTOList.add(messageDTO);
         }
         return messageDTOList;
@@ -43,6 +57,6 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
         } catch (Exception e) {
 
         }
-        LOGGER.info("结束处理");
+        LOGGER.info("结束处理: {}", messageDTO);
     }
 }

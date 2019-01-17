@@ -14,6 +14,8 @@ public class MessageDTO implements Serializable {
 
     private Date birthday;
 
+    private MessageSubDTO subMsg;
+
     public String getName() {
         return name;
     }
@@ -36,6 +38,14 @@ public class MessageDTO implements Serializable {
 
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
+    }
+
+    public MessageSubDTO getSubMsg() {
+        return subMsg;
+    }
+
+    public void setSubMsg(MessageSubDTO subMsg) {
+        this.subMsg = subMsg;
     }
 
     @Override

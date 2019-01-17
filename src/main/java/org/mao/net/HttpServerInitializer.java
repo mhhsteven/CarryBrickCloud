@@ -7,16 +7,20 @@ import org.mao.task.BrickDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 
-public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
+public class HttpServerInitializer<T extends Serializable> extends ChannelInitializer<SocketChannel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerInitializer.class);
 
     private BrickDispatcher brickDispatcher;
 
-    public HttpServerInitializer(BrickDispatcher brickDispatcher){
+    private Class clazz;
+
+    public HttpServerInitializer(BrickDispatcher brickDispatcher, Class clazz){
         this.brickDispatcher = brickDispatcher;
+        this.clazz = clazz;
     }
 
     @Override
@@ -25,7 +29,7 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 
         //回车符作为消息分隔符
         //pipeline.addLast("framer", new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()));
-        pipeline.addLast("decoder", new MessageDecoder());
+        pipeline.addLast("decoder", new MessageDecoder<T>(this.clazz));
         pipeline.addLast("encoder", new MessageEncoder());
         pipeline.addLast("handler", new HttpServerHandler(brickDispatcher));
 

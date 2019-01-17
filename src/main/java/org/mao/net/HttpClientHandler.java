@@ -39,13 +39,12 @@ public class HttpClientHandler extends SimpleChannelInboundHandler<BaseDTO> {
     public void channelRead0(ChannelHandlerContext ctx, BaseDTO msg) throws Exception {
         LOGGER.info("receive msg from server: {}", msg);
         Channel channel = ctx.channel();
-        LOGGER.info("receive msg from server: {}", channel);
         brickDispatcher.doJob(msg.getContent(), channel);
     }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        LOGGER.info("ClientChannelReadComplete");
+//        LOGGER.info("ClientChannelReadComplete");
         ctx.flush();
     }
 
