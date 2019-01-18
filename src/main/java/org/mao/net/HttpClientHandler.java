@@ -5,17 +5,23 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.mao.job.bean.BaseDTO;
 import org.mao.task.BrickDispatcher;
+import org.mao.utils.ApplicationContextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 客户端handler处理类
+ *
+ * @author mhh
+ */
 public class HttpClientHandler extends SimpleChannelInboundHandler<BaseDTO> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientHandler.class);
 
     private BrickDispatcher brickDispatcher;
 
-    public HttpClientHandler(BrickDispatcher brickDispatcher) {
-        this.brickDispatcher = brickDispatcher;
+    public HttpClientHandler() {
+        this.brickDispatcher = ApplicationContextUtils.getBean(BrickDispatcher.class);
     }
 
     /**
@@ -49,7 +55,7 @@ public class HttpClientHandler extends SimpleChannelInboundHandler<BaseDTO> {
     }
 
     /**
-     * 处理过程中出现的异常
+     * 连接异常时调用
      *
      * @param ctx
      * @param cause

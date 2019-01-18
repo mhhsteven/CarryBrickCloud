@@ -5,6 +5,11 @@ import com.google.gson.Gson;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+/**
+ * Json转换工具
+ *
+ * @author mhh
+ */
 public class JsonUtils {
 
     public static <T> T fromJson(String json, Class<T> raw, Class<?> clazz) {

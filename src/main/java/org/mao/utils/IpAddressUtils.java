@@ -12,6 +12,11 @@ import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.Set;
 
+/**
+ * 获取本机ip列表工具
+ *
+ * @author mhh
+ */
 public class IpAddressUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IpAddressUtils.class);

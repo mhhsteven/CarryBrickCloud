@@ -9,6 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 
+/**
+ * 自定义编码器
+ *
+ * @author mhh
+ */
 public class MessageEncoder extends MessageToByteEncoder<BaseDTO> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageEncoder.class);
@@ -27,6 +32,7 @@ public class MessageEncoder extends MessageToByteEncoder<BaseDTO> {
         }
     }
 
+    @Override
     protected void encode(ChannelHandlerContext ctx, BaseDTO msg, ByteBuf buf) throws Exception {
         if (msg != null) {
             byte[] b = msg.toString().getBytes(this.charset);

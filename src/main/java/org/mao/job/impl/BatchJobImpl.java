@@ -7,6 +7,7 @@ import org.mao.job.impl.bean.MessageDTO;
 import org.mao.job.impl.bean.MessageSubDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+@Service
 public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchJobImpl.class);

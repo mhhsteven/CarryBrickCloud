@@ -1,24 +1,24 @@
 package org.mao.job;
 
-import org.apache.log4j.PropertyConfigurator;
-import org.mao.job.impl.bean.MessageDTO;
 import org.mao.task.BrickDispatcher;
 import org.mao.task.TaskStatusEnum;
+import org.mao.utils.ApplicationContextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
-import java.util.List;
 
+/**
+ * 任务处理基础类
+ *
+ * @param <T>
+ * @author mhh
+ */
 public abstract class BaseBatchJob<T extends Serializable> implements IBatchJob<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseBatchJob.class);
-
-    static {
-        PropertyConfigurator.configure("CarryBrickCloud/src/main/resources/conf/log4j.properties");
-    }
 
     private TaskStatusEnum statusEnum;
 
@@ -27,26 +27,36 @@ public abstract class BaseBatchJob<T extends Serializable> implements IBatchJob<
         this.statusEnum = TaskStatusEnum.WAIT;
     }
 
-    public abstract List<T> bunch();
+    public static void main(String[] args) {
+        ApplicationContextUtils.getBean(BrickDispatcher.class).run();
+    }
 
-    public abstract void process(T t);
-
-    public boolean dispose(T t) {
+    /**
+     * 处理T(t)，调用实现类的具体处理方法process(t)
+     *
+     * @param t
+     * @return
+     */
+    public void dispose(T t) {
         this.statusEnum = TaskStatusEnum.RUNNING;
         this.process(t);
         this.statusEnum = TaskStatusEnum.WAIT;
-        return true;
     }
 
-    public static void main(String[] args) {
-        BrickDispatcher brickDispatcher = new BrickDispatcher();
-        brickDispatcher.run();
-    }
-
+    /**
+     * 判断BaseBatchJob处理T(t)是否完成
+     *
+     * @return
+     */
     public boolean processOver() {
         return this.statusEnum == TaskStatusEnum.WAIT;
     }
 
+    /**
+     * 为了获取实现类上定义的泛型的具体类
+     *
+     * @return
+     */
     public Class getRealType() {
         // 获取当前new的对象的泛型的父类类型
         ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();

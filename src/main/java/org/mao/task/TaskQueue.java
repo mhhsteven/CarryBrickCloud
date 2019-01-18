@@ -19,7 +19,7 @@ public class TaskQueue<T> {
 
     public TaskQueue() {
         this.channelDataMap = Maps.newHashMap();
-        this.channelTaskStatusMap = Maps.newHashMap();;
+        this.channelTaskStatusMap = Maps.newHashMap();
     }
 
     public void add(Channel channel, T t) {

@@ -10,8 +10,6 @@
 
     <context:component-scan base-package="org.mao"/>
 
-    <bean id="job" class="org.mao.job.impl.BatchJobImpl" lazy-init="true" />
-
     <!-- 强制使用cglib代理 如果为false则spring会自动选择 -->
     <aop:aspectj-autoproxy proxy-target-class="true"/>
 

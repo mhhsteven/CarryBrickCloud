@@ -11,137 +11,144 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.Properties;
 
+/**
+ * 读取配置类
+ *
+ * @author mhh
+ */
 public class JobConfig {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(JobConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobConfig.class);
 
-	private Integer jobId;
-	private String netMasterIp;
-	private String netRole;
+    private Integer jobId;
 
-	private static JobConfig jobConfig = null;
+    private String netMasterIp;
 
-	private JobConfig() {
+    private String netRole;
 
-	}
+    private static JobConfig jobConfig = null;
 
-	public static JobConfig getInstance() {
-		if (jobConfig == null) {
-			jobConfig = new JobConfig();
-			loadConfig();
-		}
-		return jobConfig;
-	}
+    private JobConfig() {
 
-	private static void loadConfig(InputStream inputStream) throws Exception {
-		Properties prop = new Properties();
-		prop.load(new InputStreamReader(inputStream, "UTF-8"));
+    }
 
-		Field fields[] = JobConfig.class.getDeclaredFields();
-		for (int i = 0; i < fields.length; i++) {
-			Field field = fields[i];
-			String porName = field.getName();
-			String porType = field.getType().toString();
+    public static JobConfig getInstance() {
+        if (jobConfig == null) {
+            jobConfig = new JobConfig();
+            loadConfig();
+        }
+        return jobConfig;
+    }
 
-			String val = prop.getProperty(getPropertiesKeyName(porName));
-			if (StringUtils.isNotBlank(val)) {
-				switch (porType) {
-				case "class java.lang.Integer":
-					field.set(jobConfig, Integer.parseInt(val.toString()));
-					break;
-				case "class java.lang.String":
-					field.set(jobConfig, val);
-					break;
-				case "class java.lang.Boolean":
-					field.set(jobConfig, Boolean.valueOf(val.toString()));
-					break;
-				case "class java.lang.Double":
-					field.set(jobConfig, Double.valueOf(val.toString()));
-					break;
-				case "class java.lang.Byte":
-					field.set(jobConfig, Byte.valueOf(val.toString()));
-					break;
-				case "class java.lang.Long":
-					field.set(jobConfig, Long.valueOf(val.toString()));
-					break;
-				default:
-					break;
-				}
-			}
-		}
+    private static void loadConfig(InputStream inputStream) throws Exception {
+        Properties prop = new Properties();
+        prop.load(new InputStreamReader(inputStream, "UTF-8"));
 
-		inputStream.close();
-	}
+        Field[] fields = JobConfig.class.getDeclaredFields();
+        for (int i = 0; i < fields.length; i++) {
+            Field field = fields[i];
+            String porName = field.getName();
+            String porType = field.getType().toString();
 
-	private static void loadConfig() {
-		try {
-			InputStream inputStream = JobConfig.class.getResourceAsStream("/conf/job.properties");
-			loadConfig(inputStream);
-			String path = JobConfig.getInstance().getConfigPath();
-			if (StringUtils.isNotBlank(path)) {
-				loadConfig(path);
-			}
-		} catch (Exception e) {
-			LOGGER.error("", e);
-		}
-	}
+            String val = prop.getProperty(getPropertiesKeyName(porName));
+            if (StringUtils.isNotBlank(val)) {
+                switch (porType) {
+                    case "class java.lang.Integer":
+                        field.set(jobConfig, Integer.parseInt(val.toString()));
+                        break;
+                    case "class java.lang.String":
+                        field.set(jobConfig, val);
+                        break;
+                    case "class java.lang.Boolean":
+                        field.set(jobConfig, Boolean.valueOf(val.toString()));
+                        break;
+                    case "class java.lang.Double":
+                        field.set(jobConfig, Double.valueOf(val.toString()));
+                        break;
+                    case "class java.lang.Byte":
+                        field.set(jobConfig, Byte.valueOf(val.toString()));
+                        break;
+                    case "class java.lang.Long":
+                        field.set(jobConfig, Long.valueOf(val.toString()));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
 
-	public static void loadConfig(String configPath) {
-		try {
-			File file = new File(configPath);
-			if (file.exists()) {
-				InputStream inputStream = new FileInputStream(file);
-				loadConfig(inputStream);
-			}
-		} catch (Exception e) {
-			LOGGER.error("", e);
-		}
-	}
+        inputStream.close();
+    }
 
-	private static String getPropertiesKeyName(String fieldName) {
-		char[] charaters = fieldName.toCharArray();
-		StringBuilder sb = new StringBuilder(fieldName.length() + 3);
-		for (char charater : charaters) {
-			if (charater >= 65 & charater <= 90) {
-				sb.append(".");
-				charater = (char)((int)charater + 32);
-			}
-			sb.append(charater);
-		}
-		return sb.toString();
-	}
+    private static void loadConfig() {
+        try {
+            InputStream inputStream = JobConfig.class.getResourceAsStream("/conf/job.properties");
+            loadConfig(inputStream);
+            String path = JobConfig.getInstance().getConfigPath();
+            if (StringUtils.isNotBlank(path)) {
+                loadConfig(path);
+            }
+        } catch (Exception e) {
+            LOGGER.error("", e);
+        }
+    }
 
-	private String configPath;
+    public static void loadConfig(String configPath) {
+        try {
+            File file = new File(configPath);
+            if (file.exists()) {
+                InputStream inputStream = new FileInputStream(file);
+                loadConfig(inputStream);
+            }
+        } catch (Exception e) {
+            LOGGER.error("", e);
+        }
+    }
 
-	public String getConfigPath() {
-		return configPath;
-	}
+    private static String getPropertiesKeyName(String fieldName) {
+        char[] charaters = fieldName.toCharArray();
+        StringBuilder sb = new StringBuilder(fieldName.length() + 3);
+        for (char charater : charaters) {
+            if (charater >= 65 & charater <= 90) {
+                sb.append(".");
+                charater = (char) ((int) charater + 32);
+            }
+            sb.append(charater);
+        }
+        return sb.toString();
+    }
 
-	public void setConfigPath(String configPath) {
-		this.configPath = configPath;
-	}
+    private String configPath;
 
-	public Integer getJobId() {
-		return jobId;
-	}
+    public String getConfigPath() {
+        return configPath;
+    }
 
-	public void setJobId(Integer jobId) {
-		this.jobId = jobId;
-	}
+    public void setConfigPath(String configPath) {
+        this.configPath = configPath;
+    }
 
-	public String getNetMasterIp() {
-		return netMasterIp;
-	}
+    public Integer getJobId() {
+        return jobId;
+    }
 
-	public void setNetMasterIp(String netMasterIp) {
-		this.netMasterIp = netMasterIp;
-	}
+    public void setJobId(Integer jobId) {
+        this.jobId = jobId;
+    }
 
-	public String getNetRole() {
-		return netRole;
-	}
+    public String getNetMasterIp() {
+        return netMasterIp;
+    }
 
-	public void setNetRole(String netRole) {
-		this.netRole = netRole;
-	}
+    public void setNetMasterIp(String netMasterIp) {
+        this.netMasterIp = netMasterIp;
+    }
+
+    public String getNetRole() {
+        return netRole;
+    }
+
+    public void setNetRole(String netRole) {
+        this.netRole = netRole;
+    }
 }

@@ -4,15 +4,20 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.mao.job.bean.BaseDTO;
+import org.mao.utils.ApplicationContextUtils;
 import org.mao.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.List;
 
-public class MessageDecoder<T extends Serializable> extends ByteToMessageDecoder {
+/**
+ * 自定义解码器
+ *
+ * @author mhh
+ */
+public class MessageDecoder extends ByteToMessageDecoder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageDecoder.class);
 
@@ -20,11 +25,8 @@ public class MessageDecoder<T extends Serializable> extends ByteToMessageDecoder
 
     private final Charset charset;
 
-    private Class clazz;
-
-    public MessageDecoder(Class clazz) {
+    public MessageDecoder() {
         this(Charset.defaultCharset());
-        this.clazz = clazz;
     }
 
     public MessageDecoder(Charset charset) {
@@ -44,9 +46,9 @@ public class MessageDecoder<T extends Serializable> extends ByteToMessageDecoder
         //我们标记一下当前的readIndex的位置
         buf.markReaderIndex();
 
-        // 读取传送过来的消息的长度。ByteBuf 的readInt()方法会让他的readIndex增加4
+        //读取传送过来的消息的长度。ByteBuf 的readInt()方法会让他的readIndex增加4
         int dataLength = buf.readInt();
-        // 我们读到的消息体长度为0，这是不应该出现的情况，这里出现这情况，关闭连接。
+        //我们读到的消息体长度为0，这是不应该出现的情况，这里出现这情况，关闭连接。
         if (dataLength < 0) {
             ctx.close();
         }
@@ -55,11 +57,12 @@ public class MessageDecoder<T extends Serializable> extends ByteToMessageDecoder
             buf.resetReaderIndex();
             return;
         }
-        //  嗯，这时候，我们读到的长度，满足我们的要求了，把传送过来的数据，取出来吧~~
+        //嗯，这时候，我们读到的长度，满足我们的要求了，把传送过来的数据，取出来吧~~
         byte[] b = new byte[dataLength];
         buf.readBytes(b);
         String json = new String(b, this.charset);
-        BaseDTO baseDTO = JsonUtils.fromJson(json, BaseDTO.class, this.clazz);
+        Class dtoClazz = ApplicationContextUtils.getGenericsType();
+        BaseDTO baseDTO = JsonUtils.fromJson(json, BaseDTO.class, dtoClazz);
         out.add(baseDTO);
     }
 }
