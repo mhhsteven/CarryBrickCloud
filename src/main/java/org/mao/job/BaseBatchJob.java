@@ -1,12 +1,10 @@
 package org.mao.job;
 
 import org.mao.task.BrickDispatcher;
-import org.mao.task.TaskStatusEnum;
 import org.mao.utils.ApplicationContextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 
@@ -20,13 +18,6 @@ public abstract class BaseBatchJob<T extends Serializable> implements IBatchJob<
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseBatchJob.class);
 
-    private TaskStatusEnum statusEnum;
-
-    @PostConstruct
-    public void init() {
-        this.statusEnum = TaskStatusEnum.WAIT;
-    }
-
     public static void main(String[] args) {
         ApplicationContextUtils.getBean(BrickDispatcher.class).run();
     }
@@ -38,18 +29,7 @@ public abstract class BaseBatchJob<T extends Serializable> implements IBatchJob<
      * @return
      */
     public void dispose(T t) {
-        this.statusEnum = TaskStatusEnum.RUNNING;
         this.process(t);
-        this.statusEnum = TaskStatusEnum.WAIT;
-    }
-
-    /**
-     * 判断BaseBatchJob处理T(t)是否完成
-     *
-     * @return
-     */
-    public boolean processOver() {
-        return this.statusEnum == TaskStatusEnum.WAIT;
     }
 
     /**
@@ -61,7 +41,6 @@ public abstract class BaseBatchJob<T extends Serializable> implements IBatchJob<
         // 获取当前new的对象的泛型的父类类型
         ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
         // 获取第一个类型参数的真实类型
-        Class clazz = (Class<T>) pt.getActualTypeArguments()[0];
-        return clazz;
+        return (Class<T>) pt.getActualTypeArguments()[0];
     }
 }

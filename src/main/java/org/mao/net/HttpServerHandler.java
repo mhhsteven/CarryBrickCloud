@@ -5,6 +5,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.mao.job.bean.BaseDTO;
 import org.mao.task.BrickDispatcher;
+import org.mao.task.BrickExecutorFactory;
+import org.mao.task.TaskQueue;
 import org.mao.utils.ApplicationContextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +72,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<BaseDTO> {
     @Override
     public void channelRead0(ChannelHandlerContext ctx, BaseDTO msg) throws Exception {
         LOGGER.info("recevie msg from client: {}", msg);
-        brickDispatcher.removeTask(ctx.channel());
+        TaskQueue taskQueue = ApplicationContextUtils.getBean(TaskQueue.class);
+        taskQueue.done(BrickExecutorFactory.newRemoteExecutor(ctx.channel()));
     }
 
     @Override
@@ -88,10 +91,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<BaseDTO> {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        LOGGER.info("exceptionCaught");
-        if (null != cause) {
-            cause.printStackTrace();
-        }
+        LOGGER.error("", cause);
         if (null != ctx) {
             ctx.close();
         }

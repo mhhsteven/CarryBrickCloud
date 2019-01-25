@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
@@ -40,7 +41,7 @@ public class JobConfig {
         return jobConfig;
     }
 
-    private static void loadConfig(InputStream inputStream) throws Exception {
+    private static void loadConfig(InputStream inputStream) throws IOException, IllegalAccessException {
         Properties prop = new Properties();
         prop.load(new InputStreamReader(inputStream, "UTF-8"));
 
@@ -54,22 +55,22 @@ public class JobConfig {
             if (StringUtils.isNotBlank(val)) {
                 switch (porType) {
                     case "class java.lang.Integer":
-                        field.set(jobConfig, Integer.parseInt(val.toString()));
+                        field.set(jobConfig, Integer.parseInt(val));
                         break;
                     case "class java.lang.String":
                         field.set(jobConfig, val);
                         break;
                     case "class java.lang.Boolean":
-                        field.set(jobConfig, Boolean.valueOf(val.toString()));
+                        field.set(jobConfig, Boolean.valueOf(val));
                         break;
                     case "class java.lang.Double":
-                        field.set(jobConfig, Double.valueOf(val.toString()));
+                        field.set(jobConfig, Double.valueOf(val));
                         break;
                     case "class java.lang.Byte":
-                        field.set(jobConfig, Byte.valueOf(val.toString()));
+                        field.set(jobConfig, Byte.valueOf(val));
                         break;
                     case "class java.lang.Long":
-                        field.set(jobConfig, Long.valueOf(val.toString()));
+                        field.set(jobConfig, Long.valueOf(val));
                         break;
                     default:
                         break;
@@ -109,7 +110,7 @@ public class JobConfig {
         char[] charaters = fieldName.toCharArray();
         StringBuilder sb = new StringBuilder(fieldName.length() + 3);
         for (char charater : charaters) {
-            if (charater >= 65 & charater <= 90) {
+            if (charater >= 65 && charater <= 90) {
                 sb.append(".");
                 charater = (char) ((int) charater + 32);
             }

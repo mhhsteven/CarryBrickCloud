@@ -18,7 +18,7 @@ public class HttpServer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServer.class);
 
-    public void start(Integer port) throws Exception {
+    public void start(Integer port) throws InterruptedException {
         ServerBootstrap bootstrap = new ServerBootstrap();
         // 用来接收进来的连接
         EventLoopGroup bossGroup = new NioEventLoopGroup();

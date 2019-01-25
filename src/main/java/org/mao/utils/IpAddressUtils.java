@@ -44,7 +44,7 @@ public class IpAddressUtils {
                 Enumeration addresses = netInterface.getInetAddresses();
                 while (addresses.hasMoreElements()) {
                     ip = (InetAddress) addresses.nextElement();
-                    if (ip != null && ip instanceof Inet4Address) {
+                    if (ip instanceof Inet4Address) {
                         ipAddresses.add(ip.getHostAddress());
                     }
                 }

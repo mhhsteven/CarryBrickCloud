@@ -19,12 +19,12 @@ public class ApplicationContextUtils {
         context = new ClassPathXmlApplicationContext("applicationContext.xml");
     }
 
-    public static <T> T getBean(String name, Class<T> clazz) {
+    public static <T> T getBean(String name) {
         return (T) context.getBean(name);
     }
 
     public static <T> T getBean(Class<T> clazz){
-        return (T) context.getBean(clazz);
+        return context.getBean(clazz);
     }
 
     public static Class getGenericsType() {

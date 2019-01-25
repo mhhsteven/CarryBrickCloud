@@ -9,6 +9,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * demo
+ *
+ * @author mhh
+ */
 public class MessageSubDTO implements Serializable {
 
     private List<BigDecimal> amountList;

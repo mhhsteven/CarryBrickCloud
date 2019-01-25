@@ -15,21 +15,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * job实现类(demo)
+ *
+ * @author mhh
+ */
 @Service
 public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchJobImpl.class);
 
-    private boolean flag = true;
-
     private String[] nameArray = new String[]{"任务1", "任务2", "任务3", "任务4", "任务5", "任务6", "任务7", "任务8", "任务9", "任务10"};
 
     private int age = 0;
 
+    private Random random = new Random();
+
     @Override
     public List<MessageDTO> bunch() {
         List<MessageDTO> messageDTOList = Lists.newArrayList();
-        if (age < nameArray.length) {
+        while (age < nameArray.length) {
             MessageDTO messageDTO = new MessageDTO();
             String name = nameArray[age];
             messageDTO.setName(name);
@@ -52,12 +57,11 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
     @Override
     public void process(MessageDTO messageDTO) {
         LOGGER.info("开始处理: {}", messageDTO);
-        Random random = new Random();
         int delay = random.nextInt(5) + 5;
         try {
-            Thread.sleep(delay * 1000);
+            Thread.sleep(delay * 1000L);
         } catch (Exception e) {
-
+            LOGGER.error("", e);
         }
         LOGGER.info("结束处理: {}", messageDTO);
     }

@@ -1,11 +1,10 @@
 package org.mao.net;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.mao.job.bean.BaseDTO;
-import org.mao.task.BrickDispatcher;
-import org.mao.utils.ApplicationContextUtils;
+import org.mao.task.BrickExecutor;
+import org.mao.task.BrickExecutorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +16,6 @@ import org.slf4j.LoggerFactory;
 public class HttpClientHandler extends SimpleChannelInboundHandler<BaseDTO> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientHandler.class);
-
-    private BrickDispatcher brickDispatcher;
-
-    public HttpClientHandler() {
-        this.brickDispatcher = ApplicationContextUtils.getBean(BrickDispatcher.class);
-    }
 
     /**
      * 在到服务器的连接已经建立之后将被调用
@@ -44,8 +37,9 @@ public class HttpClientHandler extends SimpleChannelInboundHandler<BaseDTO> {
     @Override
     public void channelRead0(ChannelHandlerContext ctx, BaseDTO msg) throws Exception {
         LOGGER.info("receive msg from server: {}", msg);
-        Channel channel = ctx.channel();
-        brickDispatcher.doJob(msg.getContent(), channel);
+        BrickExecutor executor = BrickExecutorFactory.newSlaveExecutor(ctx.channel());
+        LOGGER.info("接受到master分配的任务，创建执行者: {}", executor);
+        executor.exec(msg.getContent());
     }
 
     @Override
@@ -62,7 +56,7 @@ public class HttpClientHandler extends SimpleChannelInboundHandler<BaseDTO> {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+        LOGGER.error("", cause);
         ctx.close();
     }
 

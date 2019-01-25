@@ -6,6 +6,11 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * demo
+ *
+ * @author mhh
+ */
 public class MessageDTO implements Serializable {
 
     private String name;
