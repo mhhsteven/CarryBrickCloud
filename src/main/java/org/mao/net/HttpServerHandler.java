@@ -22,8 +22,11 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<BaseDTO> {
 
     private BrickDispatcher brickDispatcher;
 
+    private TaskQueue taskQueue;
+
     public HttpServerHandler() {
         this.brickDispatcher = ApplicationContextUtils.getBean(BrickDispatcher.class);
+        this.taskQueue = ApplicationContextUtils.getBean(TaskQueue.class);
     }
 
     /**
@@ -72,7 +75,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<BaseDTO> {
     @Override
     public void channelRead0(ChannelHandlerContext ctx, BaseDTO msg) throws Exception {
         LOGGER.info("recevie msg from client: {}", msg);
-        TaskQueue taskQueue = ApplicationContextUtils.getBean(TaskQueue.class);
         taskQueue.done(BrickExecutorFactory.newRemoteExecutor(ctx.channel()));
     }
 
@@ -92,8 +94,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<BaseDTO> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         LOGGER.error("", cause);
-        if (null != ctx) {
-            ctx.close();
-        }
+        taskQueue.recycle(ctx.channel());
     }
 }
