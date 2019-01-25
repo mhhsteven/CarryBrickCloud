@@ -68,11 +68,11 @@ public class TaskQueue<T extends Serializable> {
         return t;
     }
 
-    public void recycle(Channel channel) {
-        T t = channelDataMap.get(channel);
+    public void recycle(BrickExecutor executor) {
+        T t = channelDataMap.get(executor);
         processDataList.remove(t);
         sourceDataList.add(t);
-        channelTaskStatusMap.remove(channel);
+        channelTaskStatusMap.remove(executor);
     }
 
     public void done(BrickExecutor executor) {

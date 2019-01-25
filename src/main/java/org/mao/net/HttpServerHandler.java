@@ -94,6 +94,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<BaseDTO> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         LOGGER.error("", cause);
-        taskQueue.recycle(ctx.channel());
+        taskQueue.recycle(BrickExecutorFactory.newSlaveExecutor(ctx.channel()));
     }
 }
