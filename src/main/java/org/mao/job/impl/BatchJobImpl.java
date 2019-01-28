@@ -62,7 +62,7 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
         LOGGER.info("开始处理: {}", messageDTO);
         int delay = random.nextInt(5) + 5;
         try {
-            Thread.sleep(delay * 100L);
+            Thread.sleep(delay * 1000L);
             messageDTO.setProcessBy("master");
             messageDTO.setProcessStatus(true);
         } catch (Exception e) {

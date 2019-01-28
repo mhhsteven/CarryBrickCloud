@@ -88,9 +88,11 @@ public class BrickDispatcher<T extends Serializable> {
             Long delay = 1000L;
             if (executor != null) {
                 T t = taskQueue.pending(executor);
-                LOGGER.info("分配任务{}给{}", t, executor);
-                executor.exec(t);
-                delay = 0L;
+                if (t != null) {
+                    LOGGER.info("分配任务{}给{}", t, executor);
+                    executor.exec(t);
+                    delay = 0L;
+                }
             }
             try {
                 Thread.sleep(delay);
