@@ -32,6 +32,16 @@ public abstract class BaseBatchJob<T extends Serializable> implements IBatchJob<
         this.process(t);
     }
 
+    @Override
+    public void before(){
+
+    }
+
+    @Override
+    public void after(){
+
+    }
+
     /**
      * 为了获取实现类上定义的泛型的具体类
      *

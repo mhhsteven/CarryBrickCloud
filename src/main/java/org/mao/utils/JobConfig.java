@@ -27,6 +27,8 @@ public class JobConfig {
 
     private String netRole;
 
+    private Long jobRunInterval;
+
     private static JobConfig jobConfig = null;
 
     private JobConfig() {
@@ -151,5 +153,9 @@ public class JobConfig {
 
     public void setNetRole(String netRole) {
         this.netRole = netRole;
+    }
+
+    public static Logger getLOGGER() {
+        return LOGGER;
     }
 }

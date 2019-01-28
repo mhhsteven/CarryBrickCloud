@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.netty.channel.Channel;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -23,71 +25,100 @@ import java.util.Map;
 @Service
 public class TaskQueue<T extends Serializable> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskQueue.class);
+
+    /**
+     * 需要处理的数据列表
+     */
     private List<T> sourceDataList;
 
-    private List<T> processDataList;
+    /**
+     * 待处理的数据索引
+     */
+    private List<Integer> prepareIndexList;
 
-    private Map<BrickExecutor, T> channelDataMap;
+    /**
+     * 处理中的数据索引
+     */
+    private List<Integer> processIndexList;
 
-    private Map<BrickExecutor, TaskStatusEnum> channelTaskStatusMap;
+    /**
+     * 数据索引 - 任务状态
+     */
+    private Map<Integer, TaskStatusEnum> taskStatusMap;
 
-    public TaskQueue() {
-        this.channelDataMap = Maps.newHashMap();
-        this.channelTaskStatusMap = Maps.newHashMap();
-        this.processDataList = Lists.newArrayList();
+    /**
+     * 执行者 - 数据索引
+     */
+    private Map<BrickExecutor, Integer> brickTaskIndexMap;
+
+    private void reset() {
+        Integer dataCount = sourceDataList == null ? 0: sourceDataList.size();
+        this.prepareIndexList = Lists.newArrayListWithCapacity(dataCount);
+        for (int i = 0; i < dataCount; i++) {
+            this.prepareIndexList.add(i);
+        }
+        this.processIndexList = Lists.newArrayList();
+        this.taskStatusMap = Maps.newHashMap();
+        this.brickTaskIndexMap = Maps.newHashMap();
     }
 
     public void fillData(List<T> sourceDataList) {
         this.sourceDataList = sourceDataList;
+        this.reset();
     }
 
     public boolean hasNext() {
-        return CollectionUtils.isNotEmpty(sourceDataList);
+        return CollectionUtils.isNotEmpty(prepareIndexList) || CollectionUtils.isNotEmpty(processIndexList);
     }
 
     /**
-     * 从数据列表中返回一个未处理的数据
+     * 从待处理列表中返回一个未处理数据的索引
      *
      * @return
      */
-    private T next() {
-        T t = null;
-        if (this.hasNext()) {
-            t = sourceDataList.remove(0);
-            processDataList.add(t);
+    private Integer next() {
+        Integer index = null;
+        if (CollectionUtils.isNotEmpty(prepareIndexList)) {
+            index = prepareIndexList.remove(0);
+            processIndexList.add(index);
         }
-        return t;
+        return index;
     }
 
     public T pending(BrickExecutor executor) {
-        T t = this.next();
-        if (t != null) {
-            channelDataMap.put(executor, t);
-            channelTaskStatusMap.put(executor, TaskStatusEnum.RUNNING);
+        T t = null;
+        Integer index = this.next();
+        if (index != null) {
+            t = sourceDataList.get(index);
+            taskStatusMap.put(index, TaskStatusEnum.RUNNING);
+            brickTaskIndexMap.put(executor, index);
         }
         return t;
     }
 
     public void recycle(BrickExecutor executor) {
-        T t = channelDataMap.get(executor);
-        processDataList.remove(t);
-        sourceDataList.add(t);
-        channelTaskStatusMap.remove(executor);
+        Integer index = brickTaskIndexMap.remove(executor);
+        taskStatusMap.remove(index);
+        processIndexList.remove(index);
+        prepareIndexList.add(index);
     }
 
     public void done(BrickExecutor executor) {
-        T t = channelDataMap.get(executor);
-        processDataList.remove(t);
-        channelTaskStatusMap.remove(executor);
+        Integer index = brickTaskIndexMap.remove(executor);
+        taskStatusMap.remove(index);
+        processIndexList.remove(index);
     }
 
     public boolean isFree() {
-        TaskStatusEnum statusEnum = channelTaskStatusMap.get(BrickExecutorFactory.newLocalExecutor());
+        Integer index = brickTaskIndexMap.get(BrickExecutorFactory.newLocalExecutor());
+        TaskStatusEnum statusEnum = taskStatusMap.get(index);
         return this.isFree(statusEnum);
     }
 
     public boolean isFree(Channel channel) {
-        TaskStatusEnum statusEnum = channelTaskStatusMap.get(BrickExecutorFactory.newRemoteExecutor(channel));
+        Integer index = brickTaskIndexMap.get(BrickExecutorFactory.newRemoteExecutor(channel));
+        TaskStatusEnum statusEnum = taskStatusMap.get(index);
         return this.isFree(statusEnum);
     }
 

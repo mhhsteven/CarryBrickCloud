@@ -31,9 +31,11 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
 
     private Random random = new Random();
 
+    private List<MessageDTO> messageDTOList = Lists.newArrayList();
+
     @Override
     public List<MessageDTO> bunch() {
-        List<MessageDTO> messageDTOList = Lists.newArrayList();
+        List<MessageDTO> messageDTOSubList = Lists.newArrayList();
         while (age < nameArray.length) {
             MessageDTO messageDTO = new MessageDTO();
             String name = nameArray[age];
@@ -49,9 +51,10 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
             subMsg.setDateMap(dateMap);
             //messageDTO.setSubMsg(subMsg);
 
-            messageDTOList.add(messageDTO);
+            messageDTOSubList.add(messageDTO);
         }
-        return messageDTOList;
+        messageDTOList.addAll(messageDTOSubList);
+        return messageDTOSubList;
     }
 
     @Override
@@ -59,10 +62,18 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
         LOGGER.info("开始处理: {}", messageDTO);
         int delay = random.nextInt(5) + 5;
         try {
-            Thread.sleep(delay * 1000L);
+            Thread.sleep(delay * 100L);
+            messageDTO.setProcessBy("master");
+            messageDTO.setProcessStatus(true);
         } catch (Exception e) {
             LOGGER.error("", e);
         }
         LOGGER.info("结束处理: {}", messageDTO);
+    }
+
+    @Override
+    public void after() {
+        LOGGER.info("所有任务处理结果：");
+        messageDTOList.stream().forEach(dto -> LOGGER.info("{}", dto));
     }
 }

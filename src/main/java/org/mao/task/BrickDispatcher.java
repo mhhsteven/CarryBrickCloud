@@ -61,7 +61,9 @@ public class BrickDispatcher<T extends Serializable> {
             this.startServer();
             AsyncExecuteUtils.execute("调度器任务", () -> {
                 try {
+                    batchJob.before();
                     dispatcher();
+                    batchJob.after();
                 } catch (Exception e) {
                     LOGGER.error("", e);
                 }
@@ -82,6 +84,7 @@ public class BrickDispatcher<T extends Serializable> {
     private void dispatcher() {
         while (taskQueue.hasNext()) {
             BrickExecutor<T> executor = this.nextExecutor();
+            LOGGER.info("调度器检查有无空闲executor: {}", executor);
             Long delay = 1000L;
             if (executor != null) {
                 T t = taskQueue.pending(executor);
@@ -96,7 +99,6 @@ public class BrickDispatcher<T extends Serializable> {
                 Thread.currentThread().interrupt();
             }
         }
-        LOGGER.info("=============================================");
         taskQueue.fillData(batchJob.bunch());
         if (taskQueue.hasNext()) {
             this.dispatcher();

@@ -23,4 +23,14 @@ public interface IBatchJob<T> {
      * @param t
      */
     public void process(T t);
+
+    /**
+     * 处理数据前调用
+     */
+    public void before();
+
+    /**
+     * 处理数据后调用
+     */
+    public void after();
 }
