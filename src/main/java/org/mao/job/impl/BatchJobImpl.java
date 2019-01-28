@@ -25,9 +25,7 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchJobImpl.class);
 
-    private String[] nameArray = new String[]{"任务1", "任务2", "任务3", "任务4", "任务5", "任务6", "任务7", "任务8", "任务9", "任务10"};
-
-    private int age = 0;
+    private int page = 0;
 
     private Random random = new Random();
 
@@ -36,22 +34,25 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
     @Override
     public List<MessageDTO> bunch() {
         List<MessageDTO> messageDTOSubList = Lists.newArrayList();
-        while (age < nameArray.length) {
-            MessageDTO messageDTO = new MessageDTO();
-            String name = nameArray[age];
-            messageDTO.setName(name);
-            messageDTO.setAge(++age + 17);
-            messageDTO.setBirthday(new Date());
+        if (page < 3) {
+            for (int i = 0; i < 10; i++) {
+                MessageDTO messageDTO = new MessageDTO();
+                String name = "任务" + (page * 10 + i + 1);
+                messageDTO.setName(name);
+                messageDTO.setAge(18);
+                messageDTO.setBirthday(new Date());
 
-            MessageSubDTO subMsg = new MessageSubDTO();
-            List<BigDecimal> amountList = Lists.newArrayList(BigDecimal.valueOf(1), BigDecimal.valueOf(1.1));
-            subMsg.setAmountList(amountList);
-            Map<String, Date> dateMap = Maps.newHashMap();
-            dateMap.put(name, new Date());
-            subMsg.setDateMap(dateMap);
-            //messageDTO.setSubMsg(subMsg);
+                MessageSubDTO subMsg = new MessageSubDTO();
+                List<BigDecimal> amountList = Lists.newArrayList(BigDecimal.valueOf(1), BigDecimal.valueOf(1.1));
+                subMsg.setAmountList(amountList);
+                Map<String, Date> dateMap = Maps.newHashMap();
+                dateMap.put(name, new Date());
+                subMsg.setDateMap(dateMap);
+                //messageDTO.setSubMsg(subMsg);
 
-            messageDTOSubList.add(messageDTO);
+                messageDTOSubList.add(messageDTO);
+            }
+            page++;
         }
         messageDTOList.addAll(messageDTOSubList);
         return messageDTOSubList;
@@ -62,7 +63,7 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
         LOGGER.info("开始处理: {}", messageDTO);
         int delay = random.nextInt(5) + 5;
         try {
-            Thread.sleep(delay * 1000L);
+            Thread.sleep(delay * 100L);
             messageDTO.setProcessBy("master");
             messageDTO.setProcessStatus(true);
         } catch (Exception e) {
@@ -72,8 +73,13 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
     }
 
     @Override
+    public void before() {
+        LOGGER.info("start........................................");
+    }
+
+    @Override
     public void after() {
-        LOGGER.info("所有任务处理结果：");
+        LOGGER.info("本次数据处理结果：");
         messageDTOList.stream().forEach(dto -> LOGGER.info("{}", dto));
     }
 }
