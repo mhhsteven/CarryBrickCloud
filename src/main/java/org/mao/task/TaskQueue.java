@@ -43,12 +43,12 @@ public class TaskQueue<T extends Serializable> {
     private List<Integer> processIndexList;
 
     /**
-     * 数据索引 - 任务状态
+     * 数据索引<->任务状态
      */
     private Map<Integer, TaskStatusEnum> taskStatusMap;
 
     /**
-     * 执行者 - 数据索引
+     * 执行者<->数据索引
      */
     private Map<BrickExecutor, Integer> brickTaskIndexMap;
 

@@ -8,7 +8,7 @@ import io.netty.channel.Channel;
  * @param <T>
  * @author mhh
  */
-public class Notify<BaseDTO> implements INotify<BaseDTO> {
+public class Notify<BaseDTO> {
 
     private Channel channel;
 
@@ -16,7 +16,6 @@ public class Notify<BaseDTO> implements INotify<BaseDTO> {
         this.channel = channel;
     }
 
-    @Override
     public void send(BaseDTO baseDTO) {
         channel.writeAndFlush(baseDTO);
     }

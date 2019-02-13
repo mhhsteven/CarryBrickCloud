@@ -11,26 +11,26 @@ import java.io.Serializable;
  * @param <T>
  * @author mhh
  */
-public class NotifyAdapter<T extends Serializable> {
-
-    private Notify<BaseDTO> notify;
+public class NotifyAdapter<T extends Serializable> extends Notify<BaseDTO> implements INotify<T> {
 
     public NotifyAdapter(Channel channel) {
-        notify = new Notify<>(channel);
+        super(channel);
     }
 
+    @Override
     public void sendTask(T t) {
         BaseDTO baseDTO = new BaseDTO();
         baseDTO.setCode("10000");
         baseDTO.setMsg("from server");
         baseDTO.setContent(t);
-        notify.send(baseDTO);
+        this.send(baseDTO);
     }
 
+    @Override
     public void doneTask() {
         BaseDTO baseDTO = new BaseDTO();
         baseDTO.setCode("20000");
         baseDTO.setMsg("complete by client");
-        notify.send(baseDTO);
+        this.send(baseDTO);
     }
 }

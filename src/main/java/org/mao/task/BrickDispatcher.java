@@ -46,7 +46,10 @@ public class BrickDispatcher<T extends Serializable> {
      */
     private Integer port = 60000;
 
-    public BrickDispatcher() {
+    /**
+     * 初始化
+     */
+    private void initialize() {
         port = port + JobConfig.getInstance().getJobId();
         host = JobConfig.getInstance().getNetMasterIp();
         this.channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
@@ -57,6 +60,7 @@ public class BrickDispatcher<T extends Serializable> {
      * slave启动客户端连接服务器
      */
     public void run() {
+        this.initialize();
         if (this.isMaster()) {
             this.startServer();
             AsyncExecuteUtils.execute("调度器任务", () -> {

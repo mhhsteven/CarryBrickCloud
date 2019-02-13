@@ -35,7 +35,8 @@ public class BatchJobImpl extends BaseBatchJob<MessageDTO> {
     public List<MessageDTO> bunch() {
         List<MessageDTO> messageDTOSubList = Lists.newArrayList();
         if (page < 3) {
-            for (int i = 0; i < 10; i++) {
+            int maxCount = random.nextInt(10) + 5;
+            for (int i = 0; i < maxCount; i++) {
                 MessageDTO messageDTO = new MessageDTO();
                 String name = "任务" + (page * 10 + i + 1);
                 messageDTO.setName(name);
